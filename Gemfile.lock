@@ -1,8 +1,12 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    NBA_info (0.1.6)
+    NBA_info (0.1.7)
+      nokogiri (>= 1.6.2)
     json (1.8.1)
+    mini_portile (0.6.0)
+    nokogiri (1.6.3.1)
+      mini_portile (= 0.6.0)
     rack (1.5.2)
     rack-protection (1.5.3)
       rack
