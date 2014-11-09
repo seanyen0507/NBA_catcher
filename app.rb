@@ -34,11 +34,21 @@ class NBACatcherApp < Sinatra::Base
       @lineup = {}
       sean = Scraper.new
       begin
-        playernames.each do |playername|
-          sean.game[2].each do |playerlist|
-            if playerlist.include?(playername)
-              @lineup[playername] = 'Yes, he is start line up today'
+        po = sean.game[0]
+        s = sean.game[2]
+        po.each do |key, _value|
+          if key.include? 'PM'
+            5.times do
+              temp = s.shift
+              playernames.each do |playername|
+                lastname = playername.split(' ').last
+                if temp.include?(lastname.capitalize)
+                  @lineup[playername] = 'Yes, he is in start lineup today.'
+                end
+              end
             end
+          else
+            3.times { s.shift }
           end
         end
       rescue
@@ -50,7 +60,7 @@ class NBACatcherApp < Sinatra::Base
   end
 
   get '/' do
-    'Simmple NBA catcher api/v1 is up and working'
+    'Simple NBA catcher api/v1 is up and working!'
   end
 
   namespace '/api/v1' do
