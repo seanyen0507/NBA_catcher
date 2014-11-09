@@ -11,15 +11,20 @@ class NBACatcherApp < Sinatra::Base
       @profile_after = {
         'name' => playername, 'profiles' => [], 'game' => [], 'competitor' => []
       }
-
-      name = params[:playername]
-      sam.profile(name)[0].each do |key, value|
-        @profile_after['profiles'].push('Box-score' => key, 'Record' => value)
+      begin
+        name = params[:playername]
+        sam.profile(name)[0].each do |key, value|
+          @profile_after['profiles'].push('Box-score' => key, 'Record' => value)
+        end
+      rescue
+        halt 404
+      else
+        @profile_after
       end
-      @profile_after
     end
 
     def get_start_lineup(playername)
+
       sean = Scraper.new
       is_null = 'true'
       coming_game = Hash[sean.game[0].zip(sean.game[2])]
