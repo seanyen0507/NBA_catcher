@@ -48,31 +48,18 @@ class NBACatcherApp < Sinatra::Base
       end
     end
   end
-      # sean = Scraper.new
-      # is_null = 'true'
-      # coming_game = Hash[sean.game[0].zip(sean.game[2])]
-      # coming_game.each do |key, value|
-      #   if value.include?(playername)
-      #     @profile_after['game'].push(key)
-      #     @profile_after['competitor'].push(value)
-      #     is_null = 'false'
-      #   end
-      # end
-      # if is_null
-      #   @profile_after['game'].push('status' => 'noGame')
-      #   @profile_after['competitor'].push('competitors' => 'noGame')
-      # end
-      # @profile_after
 
   get '/' do
     'Simmple NBA catcher api/v1 is up and working'
   end
 
   namespace '/api/v1' do
+
     get '/player/:playername.json' do
       content_type :json
       get_profile(params[:playername]).to_json
     end
+
     post '/check' do
       content_type :json
       begin
@@ -81,16 +68,8 @@ class NBACatcherApp < Sinatra::Base
       rescue
         halt 400
       end
-
       playernames = req['playernames']
-      # startlineup = req['startlineup']
       check_start_lineup(playernames).to_json
     end
-
-    # get '/game/:playername.json' do
-    #   content_type :json
-    #   get_profile(params[:playername]).to_json
-    #   get_start_lineup(params[:playername]).to_json
-    # end
   end
 end
