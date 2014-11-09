@@ -25,16 +25,14 @@ describe 'Simple NBA Stories' do
     end
   end
 
-   describe 'Checking users for badges' do
-    it 'should find missing badges' do
+  describe 'Checking users for badges' do
+     it 'should find missing badges' do
       header = { 'CONTENT_TYPE' => 'application/json' }
-      body = {
-        playernames[].wont_be_empty
-      }
+      body = {}
 
       post '/api/v1/check', body.to_json, header
-      last_response.must_be :ok?
-    end
+      last_response.must_be :bad_request?
+     end
 
     it 'should return 404 for unknown users' do
       header = { 'CONTENT_TYPE' => 'application/json' }
