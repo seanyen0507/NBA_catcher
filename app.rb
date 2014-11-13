@@ -33,6 +33,11 @@ class NBACatcherApp < Sinatra::Base
       @lineup = {}
       sean = Scraper.new
       begin
+          sean.profile[playernames]
+      rescue
+        halt 404
+        end
+      begin
         po = sean.game[0]
         s = sean.game[2]
         po.each do |key, _value|

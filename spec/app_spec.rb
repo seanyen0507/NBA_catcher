@@ -9,7 +9,6 @@ describe 'Simple NBA Stories' do
     it 'Should return ok' do
       get '/'
       last_response.must_be :ok?
-      #last_response.body.must_match(/simplecadet/i)
     end
   end
 
@@ -30,11 +29,11 @@ describe 'Simple NBA Stories' do
       header = { 'CONTENT_TYPE' => 'application/json' }
       body = {}
 
-      post '/api/v1/check', body.to_json, header
+      post '/api/v1/check', body, header
       last_response.must_be :bad_request?
      end
 
-    it 'should return 404 for unknown users' do
+    it 'should return 404 for unknown players' do
       header = { 'CONTENT_TYPE' => 'application/json' }
       body = {
         playernames: [random_str(30), random_str(30)]
@@ -51,5 +50,5 @@ describe 'Simple NBA Stories' do
       post '/api/v1/check', body, header
       last_response.must_be :bad_request?
     end
-   end
+  end
 end
