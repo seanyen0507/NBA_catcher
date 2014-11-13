@@ -31,12 +31,19 @@ class NBACatcherApp < Sinatra::Base
 
     def check_start_lineup(playernames)
       @lineup = {}
+      @body_null = true
       sean = Scraper.new
       begin
-          sean.profile[playernames]
+        sean.profile[playernames]
       rescue
         halt 404
-        end
+      end
+      begin
+        playernames == '' ? @body_null = false : @body_null = true
+        fail 'err' if @body_null == false
+      rescue
+        halt 400
+      end
       begin
         po = sean.game[0]
         s = sean.game[2]
