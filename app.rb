@@ -1,15 +1,17 @@
 require 'sinatra/base'
-require 'sinatra/namespace'
+require_relative 'model/nbaplayer'
+# require 'sinatra/namespace'
 require 'NBA_info'
 require 'json'
 
+
 # Simple version of nba_scrapper
 class NBACatcherApp < Sinatra::Base
-  register Sinatra::Namespace
+	# register Sinatra::Namespace
 
-  configure :production, :development do
-    enable :logging
-  end
+	configure :production, :development do
+		enable :logging
+	end
 
   helpers do
     def get_profile(playername)
@@ -69,28 +71,27 @@ class NBACatcherApp < Sinatra::Base
       end
     end
   end
+	get '/' do
+		'Simple NBA catcher api/v1 is up and working!'
+	end
 
-  get '/' do
-    'Simple NBA catcher api/v1 is up and working!'
-  end
+	# namespace '/api/v1' do
 
-  namespace '/api/v1' do
+		get '/api/v1/player/:playername.json' do
+			content_type :json
+			get_profile(params[:playername]).to_json
+		end
 
-    get '/player/:playername.json' do
-      content_type :json
-      get_profile(params[:playername]).to_json
-    end
-
-    post '/check' do
-      content_type :json
-      begin
-        req = JSON.parse(request.body.read)
-        logger.info req
-      rescue
-        halt 400
-      end
-      playernames = req['playernames']
-      check_start_lineup(playernames).to_json
-    end
-  end
+		post '/api/v1/check' do
+			content_type :json
+			begin
+				req = JSON.parse(request.body.read)
+				logger.info req
+			rescue
+				halt 400
+			end
+			playernames = req['playernames']
+			check_start_lineup(playernames).to_json
+		end
+	# end
 end
