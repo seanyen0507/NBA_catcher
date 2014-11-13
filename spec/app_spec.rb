@@ -24,8 +24,8 @@ describe 'Simple NBA Stories' do
     end
   end
 
-  describe 'Checking users for badges' do
-     it 'should find missing badges' do
+  describe 'Checking users search' do
+     it 'should find none palyers' do
       header = { 'CONTENT_TYPE' => 'application/json' }
       body = {}
 
