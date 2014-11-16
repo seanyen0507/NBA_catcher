@@ -4,14 +4,13 @@ require_relative 'model/nbaplayer'
 require 'NBA_info'
 require 'json'
 
-
 # Simple version of nba_scrapper
 class NBACatcherApp < Sinatra::Base
-	# register Sinatra::Namespace
+  # register Sinatra::Namespace
 
-	configure :production, :development do
-		enable :logging
-	end
+  configure :production, :development do
+    enable :logging
+  end
 
   helpers do
     def get_profile(playername)
@@ -32,7 +31,7 @@ class NBACatcherApp < Sinatra::Base
     end
 
     def check_start_lineup(playernames,des)
-      @lineup = {"Description" => des }
+      @lineup = { 'Description' => des }
       @body_null = true
       sean = Scraper.new
       # begin
@@ -65,9 +64,9 @@ class NBACatcherApp < Sinatra::Base
           end
         end
         playernames.each do |playername|
-                if !@lineup.has_key?(playername)
-                  @lineup[playername] = 'No, he is not in start lineup today.'
-                end
+          unless @lineup.key?(playername)
+            @lineup[playername] = 'No, he is not in start lineup today.'
+          end
         end
       rescue
         halt 404
@@ -76,48 +75,47 @@ class NBACatcherApp < Sinatra::Base
       end
     end
   end
-	get '/' do
-		'Simple NBA catcher api/v1 is up and working!'
-	end
+  get '/' do
+    'Simple NBA catcher api/v1 is up and working!'
+  end
 
-	# namespace '/api/v1' do
+  # namespace '/api/v1' do
 
-		get '/api/v1/player/:playername.json' do
-			content_type :json
-			get_profile(params[:playername]).to_json
-		end
+  get '/api/v1/player/:playername.json' do
+    content_type :json
+    get_profile(params[:playername]).to_json
+  end
 
-        post '/api/v1/nbaplayers' do
-          content_type :json
-          begin
+  post '/api/v1/nbaplayers' do
+    content_type :json
+    begin
             req = JSON.parse(request.body.read)
             logger.info req
           rescue
             halt 400
           end
+    nbaplayer = Nbaplayer.new
+    nbaplayer.description = req['description'].to_json
+    nbaplayer.playernames = req['playernames'].to_json
 
-          nbaplayer = Nbaplayer.new
-          nbaplayer.description = req['description'].to_json
-          nbaplayer.playername =req['playername'].to_json
+    if nbaplayer.save
+      status 201
+      redirect "api/v1/nbaplayers/#{nbaplayer.id}"
+    end
+  end
 
-          if nbaplayer.save
-            status 201
-            redirect "api/v1/nbaplayers/#{nbaplayer.id}"
-          end
-        end
-
-        get '/api/v1/nbaplayers/:id' do
-          content_type :json
-          begin
+  get '/api/v1/nbaplayers/:id' do
+    content_type :json
+    begin
             @nbaplayer = Nbaplayer.find(params[:id])
             description = JSON.parse(@nbaplayer.description)
             playernames = JSON.parse(@nbaplayer.playernames)
-            logger.info({playernames: playernames}.to_json)
+            logger.info({ playernames: playernames }.to_json)
           rescue
             halt 400
           end
 
-          check_start_lineup(playernames,description).to_json
-        end
-	# end
+    check_start_lineup(playernames, description).to_json
+  end
+  # end
 end

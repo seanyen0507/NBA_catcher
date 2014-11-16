@@ -25,21 +25,21 @@ describe 'Simple NBA Stories' do
   end
 
   describe 'Checking users search' do
-     it 'should find none palyers' do
+    it 'should find none palyers' do
       header = { 'CONTENT_TYPE' => 'application/json' }
       body = {}
 
       post '/api/v1/nbaplayers', body, header
       last_response.must_be :bad_request?
-     end
+    end
 
     # it 'should return 404 for unknown players' do
     #   header = { 'CONTENT_TYPE' => 'application/json' }
     #   body = {
     #     playernames: [random_str(30), random_str(30)]
-    #   }
+    # }
 
-    #   post '/api/v1/nbaplayers', body.to_json, header
+    #   post '/api/v1/nbaplayers', body, header
     #   last_response.must_be :not_found?
     # end
 
