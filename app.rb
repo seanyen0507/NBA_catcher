@@ -31,15 +31,15 @@ class NBACatcherApp < Sinatra::Base
       end
     end
 
-    def check_start_lineup(playernames)
-      @lineup = {}
+    def check_start_lineup(playernames,des)
+      @lineup = {"Description" => des }
       @body_null = true
       sean = Scraper.new
-      begin
-        sean.profile[playernames]
-      rescue
-        halt 404
-      end
+      # begin
+      #   sean.profile(playernames)
+      # rescue
+      #   halt 404
+      # end
       begin
         playernames == '' ? @body_null = false : @body_null = true
         fail 'err' if @body_null == false
@@ -64,6 +64,11 @@ class NBACatcherApp < Sinatra::Base
             3.times { s.shift }
           end
         end
+        playernames.each do |playername|
+                if !@lineup.has_key?(playername)
+                  @lineup[playername] = 'No, he is not in start lineup today.'
+                end
+        end
       rescue
         halt 404
       else
@@ -82,16 +87,37 @@ class NBACatcherApp < Sinatra::Base
 			get_profile(params[:playername]).to_json
 		end
 
-		post '/api/v1/check' do
-			content_type :json
-			begin
-				req = JSON.parse(request.body.read)
-				logger.info req
-			rescue
-				halt 400
-			end
-			playernames = req['playernames']
-			check_start_lineup(playernames).to_json
-		end
+        post '/api/v1/nbaplayers' do
+          content_type :json
+          begin
+            req = JSON.parse(request.body.read)
+            logger.info req
+          rescue
+            halt 400
+          end
+
+          nbaplayer = Nbaplayer.new
+          nbaplayer.description = req['description'].to_json
+          nbaplayer.playername =req['playername'].to_json
+
+          if nbaplayer.save
+            status 201
+            redirect "api/v1/nbaplayers/#{nbaplayer.id}"
+          end
+        end
+
+        get '/api/v1/nbaplayers/:id' do
+          content_type :json
+          begin
+            @nbaplayer = Nbaplayer.find(params[:id])
+            description = JSON.parse(@nbaplayer.description)
+            playernames = JSON.parse(@nbaplayer.playernames)
+            logger.info({playernames: playernames}.to_json)
+          rescue
+            halt 400
+          end
+
+          check_start_lineup(playernames,description).to_json
+        end
 	# end
 end
