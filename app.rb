@@ -1,13 +1,14 @@
 require 'sinatra/base'
 require_relative 'model/nbaplayer'
-# require 'sinatra/namespace'
 require 'NBA_info'
 require 'json'
+require 'haml'
+require 'sinatra/flash'
 
 # Simple version of nba_scrapper
 class NBACatcherApp < Sinatra::Base
-  # register Sinatra::Namespace
-
+  enable :sessions
+  register Sinatra::Flash
   configure :production, :development do
     enable :logging
   end
@@ -77,6 +78,7 @@ class NBACatcherApp < Sinatra::Base
   end
   get '/' do
     'Simple NBA catcher api/v1 is up and working!'
+    haml :home
   end
 
   # namespace '/api/v1' do
@@ -98,10 +100,7 @@ class NBACatcherApp < Sinatra::Base
     nbaplayer.description = req['description'].to_json
     nbaplayer.playernames = req['playernames'].to_json
 
-    if nbaplayer.save
-      status 201
-      redirect "api/v1/nbaplayers/#{nbaplayer.id}"
-    end
+    redirect "api/v1/nbaplayers/#{nbaplayer.id}" if nbaplayer.save
   end
 
   get '/api/v1/nbaplayers/:id' do

@@ -7,13 +7,16 @@ gem 'json'
 
 gem 'activerecord'
 gem 'sinatra-activerecord'
+gem 'sinatra-flash'
+gem 'haml'
+gem 'tilt'
 
-group :development do 
+group :development do
 	gem 'sqlite3'
 	gem 'tux'
 end
 
-group :production do 
+group :production do
 	gem 'pg'
 end
 

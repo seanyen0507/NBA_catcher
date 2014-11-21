@@ -25,6 +25,10 @@ describe 'Simple NBA Stories' do
   end
 
   describe 'Checking users search' do
+    before do
+      Nbaplayer.delete_all
+    end
+
     it 'should find none palyers' do
       header = { 'CONTENT_TYPE' => 'application/json' }
       body = {}
@@ -33,15 +37,18 @@ describe 'Simple NBA Stories' do
       last_response.must_be :bad_request?
     end
 
-    # it 'should return 404 for unknown players' do
-    #   header = { 'CONTENT_TYPE' => 'application/json' }
-    #   body = {
-    #     playernames: [random_str(30), random_str(30)]
-    # }
+    it 'should return 404 for unknown players' do
+      header = { 'CONTENT_TYPE' => 'application/json' }
+      body = {
+        desription: 'Check invalid playernames',
+        playernames: [random_str(30), random_str(30)]
+      }
 
-    #   post '/api/v1/nbaplayers', body, header
-    #   last_response.must_be :not_found?
-    # end
+      post '/api/v1/nbaplayers', body.to_json, header
+      last_response.must_be :redirect?
+      follow_redirect!
+      #last_response.must_be :not_found?
+    end
 
     it 'should return 400 for bad JSON formatting' do
       header = { 'CONTENT_TYPE' => 'application/json' }
