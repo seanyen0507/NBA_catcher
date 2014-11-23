@@ -7,9 +7,9 @@
 			- else
 				%li
 					%a{:href => '/', :id => 'home'} Home
-			- if current_page?('cadet')
+			- if current_page?('nba')
 				%li{:class => 'current_page_item'}
-					%a{:href => '/nba', :id => 'cadet'} Nba Player
+					%a{:href => '/nba', :id => 'nba'} NBA Player
 			- else
 				%li
-					%a{:href => '/nba', :id => 'cadet'} Nba Player
+					%a{:href => '/nba', :id => 'nba'} NBA Player

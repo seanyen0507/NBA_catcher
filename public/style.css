@@ -38,13 +38,14 @@ a
 }
 
 a.lightlink {
-	color: #DDDDDD;
+	color: white;
 }
 
 table, th, td
 {
 	text-align: center;
-	background: #FAFAFA;
+	color: white;
+	background: black;
 }
 
 table.center {
@@ -53,7 +54,7 @@ table.center {
 }
 
 section {
-	background: #EDEDED;
+	background: #DDDDDD;
 }
 
 div.flash {
@@ -99,7 +100,7 @@ div.flash {
 
 #menu .current_page_item a
 {
-	background: #ff6816;
+	background: #AA0000;
 	border-radius: 8px;
 	color: #FFF;
 }
