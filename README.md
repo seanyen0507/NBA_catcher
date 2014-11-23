@@ -8,12 +8,11 @@ You can use our service to search the NBA player statistic you like, and also ca
 ##API Useage
 Enter any players you want to search in (playername)
 
-	https://NBA_catcher.herokuapp.com/api/v1/player/(playername).json
+  https://NBA_catcher.herokuapp.com/api/v1/player/(playername).json
 You also can use post to have the website data below.
 
-	http://NBA_catcher.herokuapp.com/api/vi/check
+  http://NBA_catcher.herokuapp.com/api/vi/check
 You could have a "post" request to access the data with.
 
-	curl -v -H "Accept:applicatiom/json" -H "Content-type: application/json" -X
-	POST -d "{\"playernames\":[\"kobe\",\"wade\",\"anthony\"]}" http://heroku:9292/api/v1/check
-	
+  curl -v -H "Accept:applicatiom/json" -H "Content-type: application/json" -X
+  POST -d "{\"playernames\":[\"kobe\",\"wade\",\"anthony\"]}" http://heroku/api/v1/check
