@@ -1,6 +1,6 @@
 #NBA Informtion web Application
 =============================
-[ ![Codeship Status for ChenLiZhan/MovieCrawler](https://codeship.com/projects/b23a7d90-4a4e-0132-e0ce-3a47b25aadbc/status)](http://codeship.com/project/)
+[ ![Codeship Status for seanyen0507/NBA_catcher](https://codeship.com/projects/f1a6f040-47e7-0132-a87c-56d6762cfdb8/status?branch=master)](https://codeship.com/projects/45738)
 ##Heroku service
 Click the [link](https://NBA_catcher.herokuapp.com/) to use our service.
 ##Description
