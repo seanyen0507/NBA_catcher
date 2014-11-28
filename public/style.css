@@ -38,13 +38,13 @@ a
 }
 
 a.lightlink {
-	color: white;
+	color: black;
 }
 
 table, th, td
 {
 	text-align: center;
-	color: white;
+	color: black;
 	background: black;
 }
 
@@ -54,7 +54,8 @@ table.center {
 }
 
 section {
-	background: #DDDDDD;
+	background: #FFFFFF;
+	padding:0em 0em;
 }
 
 div.flash {
@@ -68,9 +69,9 @@ div.flash {
 
 #header_wrapper {
 	overflow: hidden;
-	padding: 5em 0em;
-	background: #8DCB89 url(header.jpg) no-repeat center;
-	background-size: cover;
+	padding: 8.8em 0em;
+	background: black url(header.jpg) no-repeat left;
+	background-size: auto;
 }
 
 /*Menu*/
@@ -95,14 +96,15 @@ div.flash {
 	font-weight: 600;
 	text-transform: uppercase;
 	outline: 0;
-	color: #FFF;
+	color: white;
 }
 
+/*buttom*/
 #menu .current_page_item a
 {
 	background: #AA0000;
 	border-radius: 8px;
-	color: #FFF;
+	color: white;
 }
 
 /*Title*/
@@ -148,7 +150,8 @@ form label
 
 form .submit
 {
-	background: #8DCB89;
+	background: #003C9D;
+	color:white;
 	border-radius: 3px;
 
 }
@@ -156,10 +159,11 @@ form .submit
 .footer {
 	overflow: hidden;
 	padding: 5em 0em;
-	background: url(header.jpg) center;
+	/*background: url(header.jpg) no-repeat center;*/
 	border-top: 1px solid rgba(255,255,255,0.08);
 	text-align: center;
-	color: white;
+	background-size: cover;
+	color:black;
 }
 
 .user-input {
