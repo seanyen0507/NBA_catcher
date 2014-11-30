@@ -11,6 +11,7 @@ require 'httparty'
 class NBACatcherApp < Sinatra::Base
   enable :sessions
   register Sinatra::Flash
+  use Rack::MethodOverride
   configure :production, :development do
     enable :logging
   end
@@ -127,12 +128,13 @@ class NBACatcherApp < Sinatra::Base
     request_url = "#{API_BASE_URI}/api/v1/nbaplayers"
     playernames = params[:playernames].split("\r\n")
     params_h = {
+      description: 'hi',
       playernames: playernames
     }
 
     options =  {
-      body => params_h.to_json,
-      headers => { 'Content-Type' => 'application/json' }
+      body: params_h.to_json,
+      headers: { 'Content-Type' => 'application/json' }
     }
 
     result = HTTParty.post(request_url, options)
