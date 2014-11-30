@@ -4,8 +4,8 @@
       %dt
         %label{:for => 'check-playernames'} Player-names
       %dd
-        - if @nba
-          = find_and_preserve "<textarea cols=\"35\" id=\"check-playernames\" name=\"usernames\" rows=\"10\">#{@usernames.join("\r\n")}</textarea>"
+        - if @playernames
+          = find_and_preserve "<textarea cols=\"35\" id=\"check-playernames\" name=\"playernames\" rows=\"10\">#{@playernames.join("\r\n")}</textarea>"
         - else
           %textarea{:id => 'check-playernames', :name => 'playernames', :rows => '10', :cols => '35'}
     .float-clear
