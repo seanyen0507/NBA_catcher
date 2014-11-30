@@ -5,6 +5,8 @@ require 'json'
 require 'haml'
 require 'sinatra/flash'
 
+require 'httparty'
+
 # Simple version of nba_scrapper
 class NBACatcherApp < Sinatra::Base
   enable :sessions
@@ -134,6 +136,37 @@ nbaplayer.description = req['description'].to_json
 nbaplayer.playernames = req['playernames'].to_json
 
 redirect "api/v1/nbaplayers/#{nbaplayer.id}" if nbaplayer.save
+end
+
+API_BASE_URI = 'http://localhost:9292'
+post '/nbaplayers' do
+  request_url = "#{API_BASE_URI}/api/v1/nbaplayers"
+  playernames = params[:player-names].split("\r\n")
+  boxscores = params[:box-score].split("\r\n")
+  params_h = {
+    playernames: playernames,
+    boxscores: boxscores
+  }
+
+  options =  {  body: params_h.to_json,
+    headers: { 'Content-Type' => 'application/json' }
+  }
+
+  result = HTTParty.post(request_url, options)
+
+  if (result.code != 200)
+    flash[:notice] = 'usernames not found'
+    redirect '/nbaplayers'
+    return nil
+  end
+
+  id = result.request.last_uri.path.split('/').last
+  session[:result] = result.to_json
+  session[:playernames] = playernames
+  session[:boxscores] = boxscores
+  session[:action] = :create
+  redirect "/nbaplayers/#{id}"
+end
 end
 
 get '/api/v1/nbaplayers/:id' do
