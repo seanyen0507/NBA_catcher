@@ -4,6 +4,7 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'NBA_info'
 gem 'json'
+gem 'httparty'
 
 gem 'activerecord'
 gem 'sinatra-activerecord'
@@ -12,12 +13,12 @@ gem 'haml'
 gem 'tilt'
 
 group :development do
-	gem 'sqlite3'
-	gem 'tux'
+  gem 'sqlite3'
+  gem 'tux'
 end
 
 group :production do
-	gem 'pg'
+  gem 'pg'
 end
 
 group :test do
