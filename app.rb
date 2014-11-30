@@ -15,6 +15,7 @@ class NBACatcherApp < Sinatra::Base
     enable :logging
   end
 
+  API_BASE_URI = 'http://localhost:9292'
   helpers do
     def get_profile(playername)
       sam = Scraper.new
@@ -37,7 +38,7 @@ class NBACatcherApp < Sinatra::Base
       end
     end
 
-    def check_start_lineup(playernames,des)
+    def check_start_lineup(playernames, des)
       @lineup = { 'Description' => des }
       @body_null = true
       @player_wrong = true
@@ -69,118 +70,133 @@ class NBACatcherApp < Sinatra::Base
                 end
               end
             end
-else
-  3.times { s.shift }
-end
-end
-playernames.each do |playername|
-unless @lineup.key?(playername)
-  @lineup[playername] = 'No, he is not in start lineup today.'
-end
-end
-rescue
-halt 404
-else
-@lineup
-end
-end
-def current_page?(path = ' ')
-path_info = request.path_info
-path_info += ' ' if path_info == '/'
-request_path = path_info.split '/'
-request_path[1] == path
-end
-end
+          else
+            3.times { s.shift }
+          end
+        end
+        playernames.each do |playername|
+          unless @lineup.key?(playername)
+            @lineup[playername] = 'No, he is not in start lineup today.'
+          end
+        end
+      rescue
+        halt 404
+      else
+        @lineup
+      end
+    end
 
-get '/' do
-'Simple NBA catcher api/v1 is up and working!'
-haml :home
-end
+    def current_page?(path = ' ')
+      path_info = request.path_info
+      path_info += ' ' if path_info == '/'
+      request_path = path_info.split '/'
+      request_path[1] == path
+    end
+  end
 
-get '/nba' do
-@username = params[:playername]
-if @username
-redirect "/nba/#{@username}"
-return nil
-end
-haml :NBA
-end
+  get '/' do
+    haml :home
+  end
 
-get '/nba/:playername' do
-@nba = get_profile(:playername)
-@playername = params[:playername]
+  get '/nba' do
+    @username = params[:playername]
+    if @username
+      redirect "/nba/#{@username}"
+      return nil
+    end
+    haml :NBA
+  end
 
-if @playername && @nba.nil?
-flash[:notice] = 'playernames not found' if @nba.nil?
-redirect '/nba'
-end
-haml :NBA
-end
-# namespace '/api/v1' do
+  get '/nba/:playername' do
+    @nba = get_profile(:playername)
+    @playername = params[:playername]
 
-get '/api/v1/player/:playername.json' do
-content_type :json
-get_profile(params[:playername]).to_json
-end
+    if @playername && @nba.nil?
+      flash[:notice] = 'playernames not found' if @nba.nil?
+      redirect '/nba'
+    end
+    haml :NBA
+  end
+
+  get '/nbaplayers' do
+    @action = :create
+    haml :boxscore
+  end
+
+  post '/nbaplayers' do
+    request_url = "#{API_BASE_URI}/api/v1/nbaplayers"
+    playernames = params[:playernames].split("\r\n")
+    params_h = {
+      playernames: playernames
+    }
+
+    options =  {
+      body => params_h.to_json,
+      headers => { 'Content-Type' => 'application/json' }
+    }
+
+    result = HTTParty.post(request_url, options)
+
+    if (result.code != 200)
+      flash[:notice] = 'usernames not found'
+      redirect '/nbaplayers'
+      return nil
+    end
+
+    id = result.request.last_uri.path.split('/').last
+    session[:result] = result.to_json
+    session[:playernames] = playernames
+    session[:action] = :create
+    redirect "/nbaplayers/#{id}"
+  end
+
+  get 'nbaplayers/:id' do
+    if session[:action] == :create
+      @results = JSON.parse(session[:result])
+      @playernames = session[:playernames]
+    else
+      request_url = "#{API_BASE_URI}/api/vi/nbaplayers/#{params[:id]}"
+      options = { headers: { 'Content-Type' => 'application/json' } }
+      result = HTTParty.get(request_url, options)
+      @results = result
+    end
+
+    @id = params[:id]
+    @action = :update
+    haml :boxscore
+  end
+
+  get '/api/v1/player/:playername.json' do
+    content_type :json
+    get_profile(params[:playername]).to_json
+  end
 
   post '/api/v1/nbaplayers' do
     content_type :json
     begin
       req = JSON.parse(request.body.read)
-logger.info req
-rescue
-halt 400
-end
-nbaplayer = Nbaplayer.new
-nbaplayer.description = req['description'].to_json
-nbaplayer.playernames = req['playernames'].to_json
+      logger.info req
+    rescue
+      halt 400
+    end
+    nbaplayer = Nbaplayer.new
+    nbaplayer.description = req['description'].to_json
+    nbaplayer.playernames = req['playernames'].to_json
 
-redirect "api/v1/nbaplayers/#{nbaplayer.id}" if nbaplayer.save
-end
-
-API_BASE_URI = 'http://localhost:9292'
-post '/nbaplayers' do
-  request_url = "#{API_BASE_URI}/api/v1/nbaplayers"
-  playernames = params[:player-names].split("\r\n")
-  boxscores = params[:box-score].split("\r\n")
-  params_h = {
-    playernames: playernames,
-    boxscores: boxscores
-  }
-
-  options =  {  body: params_h.to_json,
-    headers: { 'Content-Type' => 'application/json' }
-  }
-
-  result = HTTParty.post(request_url, options)
-
-  if (result.code != 200)
-    flash[:notice] = 'usernames not found'
-    redirect '/nbaplayers'
-    return nil
+    redirect "api/v1/nbaplayers/#{nbaplayer.id}" if nbaplayer.save
   end
 
-  id = result.request.last_uri.path.split('/').last
-  session[:result] = result.to_json
-  session[:playernames] = playernames
-  session[:boxscores] = boxscores
-  session[:action] = :create
-  redirect "/nbaplayers/#{id}"
-end
-end
+  get '/api/v1/nbaplayers/:id' do
+    content_type :json
+    begin
+      @nbaplayer = Nbaplayer.find(params[:id])
+      description = JSON.parse(@nbaplayer.description)
+      playernames = JSON.parse(@nbaplayer.playernames)
+      logger.info({ playernames: playernames }.to_json)
+    rescue
+      halt 400
+    end
 
-get '/api/v1/nbaplayers/:id' do
-content_type :json
-begin
-@nbaplayer = Nbaplayer.find(params[:id])
-description = JSON.parse(@nbaplayer.description)
-playernames = JSON.parse(@nbaplayer.playernames)
-logger.info({ playernames: playernames }.to_json)
-rescue
-halt 400
-end
-
-check_start_lineup(playernames, description).to_json
-end
-# end
+    check_start_lineup(playernames, description).to_json
+  end
 end
