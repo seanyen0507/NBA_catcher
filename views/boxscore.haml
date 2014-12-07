@@ -4,14 +4,15 @@
       %dt
         %label{:for => 'check-playernames'} Player-names
       %dd
-        - if @nba
-          = find_and_preserve "<textarea cols=\"35\" id=\"check-playernames\" name=\"usernames\" rows=\"10\">#{@usernames.join("\r\n")}</textarea>"
+        - if @playername
+          = find_and_preserve "<textarea cols=\"35\" id=\"check-playernames\" name=\"playernames\" rows=\"10\">#{@playername.join("\r\n")}</textarea>"
         - else
-          %textarea{:id => 'check-playernames', :name => 'playernames', :rows => '10', :cols => '35'}
+          %textarea{id: 'check-playernames', name: 'playernames', rows: '10', cols: '35'}
     .float-clear
       %input{:type => 'submit', :value => 'submit', :id => 'check-submit', :class => 'submit'}
   %form{:action => "/nbaplayers/#{@id}", :method => 'post', :id => 'delete-form'}
     - if @action == :update
+      %input{:type => 'submit', :name => '_method', :value => 'update', :class => 'update'}  
       %input{:type => 'submit', :name => '_method', :value => 'delete', :class => 'delete'}
   - if @results
     %h1 Results

@@ -11,6 +11,7 @@ require 'httparty'
 class NBACatcherApp < Sinatra::Base
   enable :sessions
   register Sinatra::Flash
+  use Rack::MethodOverride
   configure :production, :development do
     enable :logging
   end
@@ -39,9 +40,8 @@ class NBACatcherApp < Sinatra::Base
     end
 
     def check_start_lineup(playernames, des)
-      @lineup = { 'Description' => des }
+      @lineup = {}
       @body_null = true
-      @player_wrong = true
       sean = Scraper.new
       # begin
       #   get_profile(playernames).nil ? @player_wrong = false : @player_wrong=\
@@ -99,9 +99,9 @@ class NBACatcherApp < Sinatra::Base
   end
 
   get '/nba' do
-    @username = params[:playername]
-    if @username
-      redirect "/nba/#{@username}"
+    @playername = params[:playername]
+    if @playername
+      redirect "/nba/#{@playername}"
       return nil
     end
     haml :NBA
@@ -127,21 +127,22 @@ class NBACatcherApp < Sinatra::Base
     request_url = "#{API_BASE_URI}/api/v1/nbaplayers"
     playernames = params[:playernames].split("\r\n")
     params_h = {
-      playernames: playernames
+      playernames: playernames,
+      description: ['hi']
     }
 
     options =  {
-      body => params_h.to_json,
-      headers => { 'Content-Type' => 'application/json' }
+      body: params_h.to_json,
+      headers: { 'Content-Type' => 'application/json' }
     }
 
     result = HTTParty.post(request_url, options)
 
-    if (result.code != 200)
-      flash[:notice] = 'usernames not found'
-      redirect '/nbaplayers'
-      return nil
-    end
+     if (result.code != 200)
+       flash[:notice] = 'usernames not found'
+       redirect '/nbaplayers'
+       return nil
+     end
 
     id = result.request.last_uri.path.split('/').last
     session[:result] = result.to_json
@@ -150,12 +151,33 @@ class NBACatcherApp < Sinatra::Base
     redirect "/nbaplayers/#{id}"
   end
 
-  get 'nbaplayers/:id' do
+  put '/nbaplayers/:id' do
+    request_url = "#{API_BASE_URI}/api/v1/nbaplayers/#{params[:id]}"
+    playernames = params[:playernames].split("\r\n")
+    params_h = {
+      playernames: playernames
+    }
+
+    options =  {
+      body: params_h.to_json,
+      headers: { 'Content-Type' => 'application/json' }
+    }
+    result = HTTParty.put(request_url,options)
+
+    flash[:notice] = 'record of tutorial updated'
+
+    id = result.request.last_uri.path.split('/').last
+    session[:result] = result.to_json
+    session[:playernames] = playernames
+    redirect "/nbaplayers/#{id}"
+  end
+
+  get '/nbaplayers/:id' do
     if session[:action] == :create
       @results = JSON.parse(session[:result])
       @playernames = session[:playernames]
     else
-      request_url = "#{API_BASE_URI}/api/vi/nbaplayers/#{params[:id]}"
+      request_url = "#{API_BASE_URI}/api/v1/nbaplayers/#{params[:id]}"
       options = { headers: { 'Content-Type' => 'application/json' } }
       result = HTTParty.get(request_url, options)
       @results = result
@@ -164,6 +186,13 @@ class NBACatcherApp < Sinatra::Base
     @id = params[:id]
     @action = :update
     haml :boxscore
+  end
+
+  delete '/nbaplayers/:id' do
+    request_url = "#{API_BASE_URI}/api/v1/nbaplayers/#{params[:id]}"
+    result = HTTParty.delete(request_url)
+    flash[:notice] = 'record of tutorial deleted'
+    redirect '/nbaplayers'
   end
 
   get '/api/v1/player/:playername.json' do
@@ -192,11 +221,24 @@ class NBACatcherApp < Sinatra::Base
       @nbaplayer = Nbaplayer.find(params[:id])
       description = JSON.parse(@nbaplayer.description)
       playernames = JSON.parse(@nbaplayer.playernames)
-      logger.info({ playernames: playernames }.to_json)
     rescue
       halt 400
     end
-
     check_start_lineup(playernames, description).to_json
+  end
+
+  put '/api/v1/nbaplayers/:id' do
+    content_type :json
+    begin
+      req = JSON.parse(request.body.read)
+      logger.info req
+    rescue
+      halt 400
+    end
+    nbaplayer = Nbaplayer.update(params[:id],req['playernames'].to_json)
+  end
+
+  delete '/api/v1/nbaplayers/:id' do
+    nbaplayer = Nbaplayer.destroy(params[:id])
   end
 end
