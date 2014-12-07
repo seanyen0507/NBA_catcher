@@ -166,6 +166,12 @@ form .submit
 	color:black;
 }
 
+form .delete
+{
+	background: #A00000;
+	border-radius: 3px;
+}
+
 .user-input {
 	float: left;
 	width: 50%;
