@@ -151,7 +151,28 @@ class NBACatcherApp < Sinatra::Base
     redirect "/nbaplayers/#{id}"
   end
 
-    get '/nbaplayers/:id' do
+  put '/nbaplayers/:id' do
+    request_url = "#{API_BASE_URI}/api/v1/nbaplayers/#{params[:id]}"
+    playernames = params[:playernames].split("\r\n")
+    params_h = {
+      playernames: playernames
+    }
+
+    options =  {
+      body: params_h.to_json,
+      headers: { 'Content-Type' => 'application/json' }
+    }
+    result = HTTParty.put(request_url,options)
+
+    flash[:notice] = 'record of tutorial updated'
+
+    id = result.request.last_uri.path.split('/').last
+    session[:result] = result.to_json
+    session[:playernames] = playernames
+    redirect "/nbaplayers/#{id}"
+  end
+
+  get '/nbaplayers/:id' do
     if session[:action] == :create
       @results = JSON.parse(session[:result])
       @playernames = session[:playernames]
@@ -204,6 +225,17 @@ class NBACatcherApp < Sinatra::Base
       halt 400
     end
     check_start_lineup(playernames, description).to_json
+  end
+
+  put '/api/v1/nbaplayers/:id' do
+    content_type :json
+    begin
+      req = JSON.parse(request.body.read)
+      logger.info req
+    rescue
+      halt 400
+    end
+    nbaplayer = Nbaplayer.update(params[:id],req['playernames'].to_json)
   end
 
   delete '/api/v1/nbaplayers/:id' do
