@@ -44,7 +44,7 @@ a.lightlink {
 table, th, td
 {
   text-align: center;
-  color: white;
+  color: black;
   background: black;
 }
 
@@ -144,7 +144,7 @@ div.flash {
 /*********************************************************************************/
 form label
 {
-  display: block;
+  display: block center;
   margin-bottom: 0.5em;
 }
 
@@ -153,23 +153,15 @@ form .submit
   background: #003C9D;
   color:white;
   border-radius: 3px;
-
 }
 
 .footer {
   overflow: hidden;
   padding: 5em 0em;
-  /*background: url(header.jpg) no-repeat center;*/
   border-top: 1px solid rgba(255,255,255,0.08);
   text-align: center;
   background-size: cover;
   color:black;
-}
-
-form .delete
-{
-	background: #A00000;
-	border-radius: 3px;
 }
 
 .user-input {
@@ -178,7 +170,5 @@ form .delete
 }
 
 .user-output {
-  
   float: left;
-
 }
